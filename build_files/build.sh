@@ -1,10 +1,7 @@
 #!/bin/bash
 set -ouex pipefail
 
-# No COPR needed - rawhide base has latest NVK/Mesa git daily (community bug reports → patches next day)
-# kernel stock rawhide = responsive gaming beast (no need tkg conflicts)
-
-# Install our light tweaks (extras you wanted)
+# Install our light tweaks (rawhide NVK/Mesa already daily bleeding-edge maxed)
 rpm-ostree install \
     zsh \
     uutils-coreutils \
@@ -12,8 +9,13 @@ rpm-ostree install \
 
 # Set zsh as default shell for root and new users
 chsh -s /bin/zsh root
-cp -r /etc/skel/. ~root/.
-echo "alias ls='uu-ls'  # uutils coreutils aliases" >> /etc/skel/.zshrc
+
+# Fix for Atomic minimal root home (create dir first)
+mkdir -p /root
+cp -r /etc/skel/. /root/.
+
+# uutils aliases sauce
+echo "alias ls='uu-ls'  # uutils coreutils" >> /etc/skel/.zshrc
 echo "alias ll='uu-ls -l'" >> /etc/skel/.zshrc
 echo "alias cat='uu-cat'" >> /etc/skel/.zshrc
 echo "alias cp='uu-cp'" >> /etc/skel/.zshrc
