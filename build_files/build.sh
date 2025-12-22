@@ -1,24 +1,26 @@
 #!/bin/bash
-
 set -ouex pipefail
 
-### Install packages
+# Enable COPRs for bleeding-edge sauce
+rpm-ostree copr enable whitehara/kernel-tkg  # Zen-like gaming kernel patches (responsive AF)
+rpm-ostree copr enable xxmitsu/mesa-and-llvm-git  # Latest mesa-git + llvm-git for max NVK gains (active & frequent builds)
 
-# Packages can be installed from any enabled yum repo on the image.
-# RPMfusion repos are available by default in ublue main images
-# List of rpmfusion packages can be found here:
-# https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/39/x86_64/repoview/index.html&protocol=https&redirect=1
+# Remove old stock shit and install our tweaks
+rpm-ostree override remove mesa* libdrm* kernel* kernel-core kernel-modules || true
+rpm-ostree install \
+    mesa-git \
+    vulkan-loader-git \
+    libdrm-git \
+    kernel-tkg kernel-tkg-core kernel-tkg-modules kernel-tkg-modules-extra kernel-tkg-devel \
+    zsh \
+    uutils-coreutils \
+    zenity
 
-# this installs a package from fedora repos
-dnf5 install -y tmux 
+# Set zsh as default shell
+chsh -s /bin/zsh root
+cp -r /etc/skel/. ~root/.
+echo "alias ls='uu-ls'  # uutils aliases (add more if you want)" >> /etc/skel/.zshrc
 
-# Use a COPR Example:
-#
-# dnf5 -y copr enable ublue-os/staging
-# dnf5 -y install package
-# Disable COPRs so they don't end up enabled on the final image:
-# dnf5 -y copr disable ublue-os/staging
-
-#### Example for enabling a System Unit File
-
-systemctl enable podman.socket
+# Cleanup for clean image
+rpm-ostree cleanup -m
+ostree container commit
