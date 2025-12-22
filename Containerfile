@@ -3,8 +3,7 @@ FROM scratch AS ctx
 COPY build_files /
 
 # Base Image
-FROM quay.io/fedora-ostree-desktops/cosmic-atomic:stable
-
+FROM quay.io/fedora-ostree-desktops/cosmic-atomic:rawhide
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:latest
 # FROM ghcr.io/ublue-os/bluefin-nvidia:stable
